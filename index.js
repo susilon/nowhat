@@ -1,29 +1,41 @@
 /**
- * Websocket Basic Example
  * 
- * Websocket Chat Basic Example
- * For Demo Only
+ * Websocket Chat Basic Server Example
+ * For Demo Only, no static files caching
  * author : susilonurcahyo@gmail.com
  *
 */
 
-const pinipig = require("pinipig")
+const pinipig = require("./pinipig/pinipig.js")
 const querystring = require('querystring')
+const fs = require('fs')
 const port=9090
 var clients = []
 
 let Handshake = (ctx) => {    
     // get querystring    
-    query = querystring.parse(ctx.req.getQuery())
-    console.log(query.token + ' connected')
-    // set client token
-    ctx.ws.token = query.token
-    // send list of connected members to new member   
-    ctx.ws.send(createMessage(getMembers(), 'memberinfo'))
-    // broadcast new member to other connected members
-    broadcast(ctx.ws.token, 'newmember')
-    // insert new member to array
-    clients.push(ctx.ws);
+    query = querystring.parse(ctx.req.getQuery())    
+    // check existing token
+    var isUserExists = false;
+    for( var i = 0; i < clients.length; i++){ 
+      if ( clients[i].token === query.token) { 
+        isUserExists = true;        
+      }
+    }
+    if (isUserExists) {
+      // disconnect member
+      ctx.ws.close();
+    } else {
+      console.log(query.token + ' connected')
+      // set client token
+      ctx.ws.token = query.token
+      // send list of connected members to new member   
+      ctx.ws.send(createMessage(getMembers(), 'memberinfo'))
+      // broadcast new member to other connected members
+      broadcast(ctx.ws.token, 'newmember')
+      // insert new member to array
+      clients.push(ctx.ws);
+    }    
 }
 let WSMessage = (ctx) => {
     try{
@@ -64,15 +76,30 @@ let WSMessage = (ctx) => {
 }
 let WSClose = (ctx) => {
     for( var i = 0; i < clients.length; i++){ 
-        if ( clients[i].token === ctx.ws.token) { 
-          clients.splice(i, 1); 
-        }
+      if ( clients[i].token === ctx.ws.token) { 
+        clients.splice(i, 1); 
       }
-      broadcast(ctx.ws.token, 'memberout')
-      console.log('WebSocket ' + ctx.ws.token + ' closed!');
+    }
+    broadcast(ctx.ws.token, 'memberout')
+    console.log('WebSocket ' + ctx.ws.token + ' closed!');
 }
+let ChatForm = (ctx) => {
+  try {
+    ctx.res.writeHeader("content-type", "text/html")
 
-let routes = [
+    filedata = fs.readFileSync('./example/client.html', 'utf8')    
+
+    ctx.res.write(filedata)
+    ctx.res.end() 
+  } catch (e) {
+    ctx.res.end() 
+    console.log(e)
+  }
+};
+let routes = [{
+      url: "/*", // handle web client page
+      get: ChatForm
+    },
     {
         url: "/ws", // ws://localhost:9090/ws
         ws: {
@@ -92,7 +119,7 @@ let routes = [
 let options = {
     port: port,
     routes: routes,
-    banner: `NodeJS-uWebSocket-Server ` + port
+    banner: `nowhat : NodeJS-uWebSocket-Chat-Server ` + port
 };
 
 pinipig.createServer(options);
@@ -103,7 +130,6 @@ function broadcast(message, msgtype){
         client.send(createMessage(message, msgtype));                
     });
 }
-
 function createMessage(message, msgtype) {
     return JSON.stringify({m: message,tp: msgtype})    
 }

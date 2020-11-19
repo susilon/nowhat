@@ -1,0 +1,51 @@
+{
+  "name": "pinipig",
+  "version": "1.6.1",
+  "description": "A super `simple` webservice functional-like framework",
+  "main": "pinipig.js",
+  "scripts": {
+    "dev": "nodemon ./test/test-server",
+    "pub:patch": "npm version patch && npm publish",
+    "pub:minor": "npm version minor && npm publish",
+    "pub:major": "npm version major && npm publish",
+    "postpublish": "git push --follow-tags",
+    "test": "mocha ./test/test.js --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmdisuanco/pinipig.git"
+  },
+  "keywords": [
+    "webservices",
+    "webservice",
+    "websocket",
+    "ws",
+    "microservice",
+    "rest",
+    "api",
+    "restful api",
+    "http",
+    "pinipig"
+  ],
+  "author": "John Martin R. Disuanco",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jmdisuanco/pinipig/issues"
+  },
+  "homepage": "https://pinipig.js.org",
+  "dependencies": {
+    "8colors": "^1.0.1",
+    "bcrypt": "^3.0.8",
+    "bluebird": "^3.5.3",
+    "fast-stringify": "^1.1.1",
+    "jsonwebtoken": "^8.4.0",
+    "lodash": "^4.17.15",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v17.6.0",
+    "utf8": "^3.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^7.1.1",
+    "mongodb": "^3.1.13",
+    "tingodb": "^0.6.1"
+  }
+}
