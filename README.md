@@ -5,7 +5,7 @@ For Demo Purposes Only.
 
 Limited to one room only.
 <br><br>
-[Live Demo](http://13.76.172.84:9090)
+[Live Demo](https://nowhat.azure.susilon.com)
 <br><br>
 ### Projects Dependencies
 
